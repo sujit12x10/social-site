@@ -1,0 +1,136 @@
+{% load static %}
+{% url "posts:main-post-view" as path_to_posts %}
+{% url "profiles:my-profile-view" as path_to_my_profile %}
+{% url "profiles:my-invites" as path_to_my_invites %}
+{% url "profiles:invite-profiles-view" as path_to_send_invites %}
+{% url "profiles:all-profiles-view" as path_to_all_profiles %}
+{% url "profiles:my-friends-list-view" as path_to_my_friends %}
+{% url "profiles:requested-profiles-list-view" as path_to_requested_profiles %}
+<!DOCTYPE html>
+   <html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+      <!--=============== REMIXICONS ===============-->
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/3.5.0/remixicon.css">
+
+      <!--=============== CSS ===============-->
+
+      <link href="https://fonts.googleapis.com/css2?family=Racing+Sans+One&display=swap" rel="stylesheet">
+   </head>
+   <body>
+      <!--==================== HEADER ====================-->
+      <header class="nav-header" id="nav-header">
+         <nav class="nav container">
+            <div>
+                <a style="font-family: Racing Sans One;" href="#" class="nav__logo"><span style="color: darkgrey; font-weight: 900; font-size: larger;">bffBook</a>
+            </div>
+            {% if request.user.is_authenticated %}
+                <div>
+                    <a style="color: aliceblue; font-size: large; padding: 3px;" class="float-right {% if request.path == path_to_posts %}custom-active{% endif %}" href="{{path_to_posts}}">Board</a>
+                </div>        
+            {% endif %}
+  
+            <div class="nav__menu" id="nav-menu">   
+               <ul class="nav__list">
+                  <li class="nav__item">
+                    {% if request.user.is_authenticated %}
+                        <div class="item">                                                         
+                            <div style="font-family: Lobster, sans-serif; border-radius: 1px; letter-spacing: 1.2px;" class="small green ui button floating dropdown icon"> Actions
+                                <i class="dropdown icon"></i>
+                                <div class="menu">
+                                    <a href="{{ path_to_my_friends }}" class="item {% if request.path == path_to_my_friends %}dropdown-custom-active{% endif %}">
+                                        My Friends
+                                    </a>
+                                    <a href="{{ path_to_all_profiles }}" class="item {% if request.path == path_to_all_profiles %}dropdown-custom-active{% endif %}">
+                                        All Profiles
+                                    </a>
+                                    <a href="{{ path_to_send_invites }}" class="item {% if request.path == path_to_send_invites %}dropdown-custom-active{% endif %}">
+                                        Find Friends
+                                    </a>
+                                    <a href="{{ path_to_requested_profiles }}" class="item {% if request.path == path_to_requested_profiles %}dropdown-custom-active{% endif %}">
+                                        Requested &nbsp; <div class="ui green horizontal left pointing label">{{ receivers_count }}</div>
+                                    </a>
+                                    <a href="{{ path_to_my_invites }}" class="item {% if request.path == path_to_my_invites %}dropdown-custom-active{% endif %}">
+                                        Invitations &nbsp; <div class="ui green horizontal left pointing label">{{ invites_count }}</div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>  
+                    {% endif %}
+                  </li>
+
+                {% if request.user.is_authenticated %}
+                    <li class="nav__item">
+                        <i class="ri-search-line nav__search" id="search-btn"></i>&nbsp;
+                        <span id="search-text" style="cursor: pointer; color: aliceblue; font-family: Racing Sans One; font-size: large;">Search</span>
+                    </li>
+                {% endif %}
+
+                  <li class="nav__item">
+                    {% if request.user.is_authenticated %}
+                    <form method="post" action="{% url "logout" %}" class="ui item form">
+                        {% csrf_token %}
+                        <input style="font-family: Racing Sans One, sans-serif; background-color: transparent; color: aliceblue; font-size: large;" type="submit" value="Logout">
+                    </form>
+                    {% endif %}
+                  </li>
+               </ul>
+
+               <!-- Close button -->
+               <div class="nav__close" id="nav-close">
+                  <i class="ri-close-line"></i>
+               </div>
+            </div>
+
+            <div class="nav__actions">
+               <!-- Search button -->
+                {% if request.user.is_authenticated %}
+                    <img style="z-index: -100;" src={{request.user.profile.avatar.url}} class="ui avatar image">
+                    <a href="{{ path_to_my_profile }}" class="nav__link">{{ request.user }}</a>
+                {% else %}
+                    <a style="margin-right: 1rem;" href="{% url "login" %}" class="nav__link">Login</a>
+               {% endif %}
+               <!-- Login button -->
+               <!-- <i class="ri-user-line nav__login" id="login-btn"></i> -->
+
+               <!-- Toggle button -->
+               {% if request.user.is_authenticated %}
+                    <div style="margin-right: 1rem;" class="nav__toggle" id="nav-toggle">
+                        <i class="ri-menu-line"></i>
+                    </div>
+                {% endif %}
+            </div>
+         </nav>
+      </header>
+
+      <!--==================== SEARCH ====================-->
+      <div class="search" id="search">
+         <form action="{% url "profiles:all-profiles-view" %}" class="search__form">
+            <i class="ri-search-line search__icon"></i>
+            <input type="search" placeholder="search users..." name="search-area" value="{{ search_input }}" class="search__input">
+         </form>
+
+         <i class="ri-close-line search__close" id="search-close"></i>
+      </div>
+
+      <!--==================== LOGIN ====================-->
+      <div class="login" id="login">
+            <i class="ri-close-line login__close" id="login-close"></i>
+            <div class="login__form col-lg-10 col-sm-12" style="margin-bottom: 25px;">
+                <div class="ui segment">
+                    <form action="" method="POST" class="ui form" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {{ p_form.as_p }}
+                        <button style="font-family: Lobster, sans-serif; border-radius: 1px;" type="submit" class="btn btn-success btn-lg" name="submit_p_form">Send Post</button>
+                    </form>
+                </div>
+            </div>
+      </div>
+
+      <!--==================== MAIN ====================-->
+      
+      <!--=============== MAIN JS ===============-->
+   </body>
+</html>

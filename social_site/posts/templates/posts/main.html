@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}| Posts{% endblock %}
+
+{% block content %}
+    {% if post_added %}
+        <div class="row">
+            <div class="col-lg-10 col-sm-12 mb-5">
+                <div class="alert alert-success" role="alert">
+                    <h4>Post added successfully !</h4>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    {% if error %}
+        <div class="row">
+            <div class="col-lg-10 col-sm-12 mb-5">
+                <div class="alert alert-danger" role="alert">
+                    <h4>{{ error|striptags }}</h4>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+    <button style="border-radius: 0px; font-family: Lobster, sans-serif;" id="login-btn" class="btn btn-success btn-lg mb-7">Add Post !</button>
+    <div class="row">
+        <div class="col-lg-10 col-sm-12 mb-5">
+            {% for post in posts %}
+                <div class="ui fluid card">
+                    <div class="ui fluid card">
+                        <div class="content">
+                            <div class="right floated meta">
+                                {% if request.user == post.author.user %}
+                                    <a href="{% url "posts:post-update" post.pk %}"><button class="ui button bwhite-lg">Update</button></a>
+                                    <a href="{% url "posts:post-delete" post.pk %}"><button class="ui button bwhite-lg">Delete</button></a>
+                                {% endif %} 
+                            </div>
+                                <img class="ui avatar image" src="{{ post.author.avatar.url }}" alt="">
+                                <span style="font-size: large;"><a href="{{ post.author.get_absolute_url }}">{{ post.author.user }}</a></span> | {{ post.created|timesince  }} ago
+                        </div>
+                    </div>
+                    <div class="ui fluid image">
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="">
+                        {% endif %}
+                    </div>
+
+                    <div class="content">
+                        <p>{{ post.content }}</p>
+                        <div class="right floated">
+                            <form action="{% url "posts:post-like-view" %}" method="post" class="like-form">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                            
+                                <button data-icon="up" data-action="{% if profile in post.liked.all %}un{% endif %}like" data-id="{{post.id}}" id="like-btn{{post.id}}" type="submit" class="ui bwhite-sm button like-btn">
+                                    {% if profile not in post.liked.all %}
+                                        <i id="icon{{post.id}}" class="thumbs up icon"></i></button>
+                                        <!-- like</button> -->
+                                    {% else %}
+                                        <i id="icon{{post.id}}" class="thumbs down icon"></i></button>
+                                        <!-- unlike</button> -->
+                                    {% endif %}         
+                                        <span id="likes{{post.id}}">{{ post.num_likes }} like{{ post.num_likes|pluralize }}</span>
+                            </form>
+                        </div>
+                        <i class="comment icon"></i>
+                        <span id="comments{{post.id}}">{{ post.num_comments }} comment{{ post.num_comments|pluralize }}</span>
+                    </div>
+                    <div class="extra content">
+                        <div class="mb-5">
+
+                        </div>
+                        <button style="border-radius: 1px;" data-id="{{post.id}}" class="cmt_btn ui button grey mb-5" id="cmt_btn">show/hide comments</button>
+                        <div class="comment-box" id="comment-box{{post.id}}">
+                            {% if post.comment_set.all %}
+                                {% for comment in post.comment_set.all %}
+                                    <div class="ui segment mb-5">
+                                        <img class="ui avatar image" src="{{ comment.user.avatar.url }}" alt="">
+                                        <span>{{ comment.user }}</span> | {{ comment.created|date:"d-m-Y h:i A" }}
+                                        <div class="mt-5">{{ comment.body }}</div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="ui segment">
+                        <form action="" method="post" id="form{{post.id}}" class="ui fluid form">
+                            {% csrf_token %}
+                            {{ c_form }}
+                            <input type="hidden" name="post_id" value="{{ post.id }}" >
+                            <button data-id="{{post.id}}" style="border-radius: 1px;" style="margin-top: 10px;" type="submit" class="ui primary button mt-7 w-full cmnt-btn" name="submit_c_form">comment</button>
+                        </form>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+
+

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}| My Invites {% endblock %}
+
+{% block content %}
+    {% if is_empty %}
+        <h2>No invitations received yet!</h2>
+    {% else %}
+    <center>
+        <h2>My Invites</h2>
+    </center>
+    <hr>
+        {% for invite in invites %}
+            <div class="ui segment">
+                <div class="ui grid">
+                    <div class="row">
+                        <div class="three wide column">
+                            <img class="ui small circular image" src="{{ invite.avatar.url }}" alt="">
+                        </div>
+                        <div class="thirteen wide column">
+                            <h3>{{ invite.user }}</h3>
+                            <p>{{ invite.bio }}</p>
+                            <a href="{{ invite.get_absolute_url }}"><button style="border-radius: 1px;" class="ui primary small button w-big mb-5 custom-btn">View Profile</button></a>
+                            <div>
+                                <form action="{% url "profiles:accept-invitation" %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value="{{invite.pk}}">
+                                    <button type="submit" class="btn btn-outline-success mb-5" style="border-radius: 1px; width: 90px;"><i class="check icon"></i>Accept</button>
+                                </form>
+                                <form action="{% url "profiles:reject-invitation" %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value="{{invite.pk}}">
+                                    <button type="submit" class="btn btn-outline-danger mb-5" style="border-radius: 1px;"><i class="close icon"></i>Reject</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% endif %}
+        
+{% endblock %}

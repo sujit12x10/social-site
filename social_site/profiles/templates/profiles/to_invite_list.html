@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}| Send Invite {% endblock %}
+
+{% block content %}
+    <center>
+        <h1>Send Invitation</h1>
+    </center>
+    <hr>
+        <div class="ui four stackable doubling blue inverted cards link mt-5">
+            {% for profile in profiles %}
+                <div class="ui fluid card">
+                    <div class="image">
+                        <img src="{{ profile.avatar.url }}">
+                    </div>
+                    <div class="content">
+                        <a href="{{ profile.get_absolute_url }}" class="header">{{ profile.user }}</a>
+                        <div class="meta">
+                        <span class="date">Joined in {{ profile.created.year }}</span>
+                        </div>
+                        <div class="description">
+                        <p>{{ profile.bio }}</p>
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <span class="">
+                            <i class="user icon"></i>{{ profile.get_friends_no}} Friends
+                        </span>
+                        <span class="right floated">       
+                                <form action="{% url "profiles:send-invitation" %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                                    <button type="submit" class="btn btn-outline-success mb-5 btn-sm" style="border-radius: 1px;"><i class="plus square icon"></i>Add to freinds</button>
+                                </form>
+                        </span>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+{% endblock %}

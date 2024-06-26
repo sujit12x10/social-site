@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}Edit your account{% endblock %}
+
+{% block content %}
+    <h2>Edit your profile</h2>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="mt-4 mb-4 text-danger">
+            {% for field in user_form %}
+                {{ field.errors|striptags }}
+            {% endfor %}
+            {% for field in profile_form %}
+                {{ field.errors|striptags }}
+            {% endfor %}
+        </div>
+        {% render_field user_form.username class="form-control mb-4 mt-4" placeholder="Username" %}
+        {% render_field user_form.first_name class="form-control mb-4" placeholder="First Name" %}
+        {% render_field user_form.last_name class="form-control mb-4" placeholder="Last Name" %}
+        {% render_field user_form.email class="form-control mb-4" placeholder="Email" %}
+        <p><input type="submit" value="Save changes" class="btn btn-dark"></p>
+    </form>
+{% endblock %}

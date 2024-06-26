@@ -1,0 +1,63 @@
+{% url "posts:main-post-view" as path_to_posts %}
+{% url "profiles:my-profile-view" as path_to_my_profile %}
+{% url "profiles:my-invites" as path_to_my_invites %}
+{% url "profiles:invite-profiles-view" as path_to_send_invites %}
+{% url "profiles:all-profiles-view" as path_to_all_profiles %}
+
+
+<div class="ui inverted menu nav" style="margin-bottom: 40px;">
+  <div class="ui container">
+    <a href="{{path_to_home}}" class="{% if request.path == path_to_home %}active{% endif %} item">
+        <h3 style="font-family: Racing Sans One, sans-serif; color: darkgrey;">bffBook</h3>
+    </a>
+    {% if request.user.is_authenticated %}
+    <a style="font-family: Racing Sans One, sans-serif;" href="{{path_to_posts}}" class="{% if request.path == path_to_posts %}active{% endif %} item">
+        Board
+    </a>
+    {% endif %}
+
+    <div class="right menu">
+        {% if request.user.is_authenticated %}
+        <div class="item">
+            <div style="font-family: Racing Sans One, sans-serif;" class="ui floating dropdown icon button green"> Friends
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a href="{{ path_to_all_profiles }}" class="item {% if request.path == path_to_all_profiles %}active{% endif %}">
+                        All Profiles
+                    </a>
+                    <a href="{{ path_to_send_invites }}" class="item {% if request.path == path_to_send_invites %}active{% endif %}">
+                        Requested
+                    </a>
+                    <a href="{{ path_to_my_invites }}" class="item {% if request.path == path_to_my_invites %}active{% endif %}">
+                        Invitations &nbsp; <div class="ui purple horizontal label">{{ invites_count }}</div>
+                    </a>
+                </div>
+             </div>
+        </div>
+             <div class="item">
+                <form action="" method="GET">
+                    <div class="ui action left icon input">
+                    <input class="prompt" type="text" name='q' placeholder="name of a friend...">
+                    <i class="search icon"></i>
+                    <button style="font-family: Racing Sans One, sans-serif;" type='submit' class="ui button">Search</button>
+                    </div>
+                </form>
+            </div>
+        
+            <a href="{{ path_to_my_profile }}" class="{% if request.path == path_to_my_profile %}active{% endif %} item">
+                <img src={{request.user.profile.avatar.url}} class="ui avatar image">&nbsp;
+                 {{ request.user }}
+            </a>
+
+            <form method="post" action="{% url "logout" %}" class="ui item form">
+                {% csrf_token %}
+                <button style="font-family: Racing Sans One, sans-serif; background-color: transparent; color: rgba(255, 255, 255, .9);;" type="submit" class="ui button width">Logout</button>
+            </form>
+        {% else %}
+            <a style="font-family: Racing Sans One, sans-serif;" href="{% url "login" %}" class="ui item">
+                Login
+            </a>
+        {% endif %}
+    </div>
+  </div>
+</div>

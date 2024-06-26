@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}| Myprofile{% endblock %}
+
+{% block content %}
+    <!-- Modal -->
+    <div class="ui modal mymodal">
+        <i class="close icon"></i>
+        <div class="ui header center aligned">
+            <h2><i class="icon user"></i>{{ request.user }}</h2>
+        </div>
+        <div class="image content">
+            <div class="ui medium image">
+              <img src="{{ profile.avatar.url }}">
+            </div>
+            <div class="description">
+                <div class="ui header"><h5>Provide some additional/newest info about you.</h5></div>
+                <form style="font-family: Racing Sans One, sans-serif;" method="post" class="ui form" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+            </div>
+        </div>
+        <div class="actions">
+                <button style="border-radius: 1px;" type='submit' class="ui positive right labeled icon button">
+                  Update
+                  <i class="checkmark icon"></i>
+                </button>
+                </form>
+        </div>
+    </div>
+
+    {% if confirm %}  
+      <div class="row">
+        <div class="col-sm-12 mb-5">
+            <div class="alert alert-success" role="alert">
+              Your profile has been updated successfully !
+            </div>
+        </div>
+      </div>
+    {% endif %}
+    
+    <div class="ui segment">
+        <div class="row">
+            <div class="col-lg-4 col-md-3 col-sm-12">
+                <img src="{{ profile.avatar.url }}" class="ui rounded image" alt="">
+                <div class="mt-5">
+                    <button style="border-radius: 1px;" class="ui secondary button mb-5" id="update-btn">Update your profile</button>
+                </div>
+          </div>
+          <div class="col-lg-8 col-md-9 col-sm-12">
+              <div class="ui center aligned green inverted segment">
+                    <h3><i class="user icon"></i>Your Stats</h3>
+              </div>
+                  <table class="table table-striped">
+                    <tbody>
+                        <tr>
+                          <td><h5>Username:</h5></td>
+                          <td><h5>{{ profile.user }}</h5></td>
+                        </tr>
+                        <tr>
+                          <td><h5>Joined:</h5></td>
+                          <td><h5>{{ profile.created.year }}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>First Name:</h5></td>
+                            <td><h5>{{ profile.first_name }}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Last Name:</h5></td>
+                            <td><h5>{{ profile.last_name }}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Bio:</h5></td>
+                            <td><h5>{{ profile.bio|truncatechars:10 }}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Number of Friends:</h5></td>
+                            <td><h5>{{ profile.get_friends_no }}</h5></td>
+                        </tr>
+                        <!-- <tr>
+                            <td><h5>Friends:</h5></td>
+                            <td><h5>{{ profile.get_friends }}</h5></td>
+                        </tr> -->
+                        <tr>
+                            <td><h5>Number of Posts:</h5></td>
+                            <td><h5>{{ profile.get_total_posts }}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Number of likes given:</h5></td>
+                            <td><h5>{{ profile.get_likes_given_no }}</h5></td>
+                        </tr>
+                        <tr>
+                            <td><h5>Number of likes received:</h5></td>
+                            <td><h5>{{ profile.get_likes_received_no }}</h5></td>
+                        </tr>
+                    </tbody>
+                </table>
+          </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+
+
+
+
+
+

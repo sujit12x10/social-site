@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}| Requested {% endblock %}
+
+{% block content %}
+    <center>
+        <h1>Waiting for Approval...</h1>
+    </center>
+    <hr>
+        {% if receivers|length == 0 %}
+            <h2>No requests send yet!</h2>
+        {% else %}
+            <div class="ui four stackable doubling cards mt-5">
+                {% for receiver in receivers %}
+                <div class="ui fluid card">
+                    <div class="image">
+                            <img src="{{ receiver.avatar.url }}">
+                        </div>
+                        <div class="content">
+                            <a href="{{ receiver.get_absolute_url }}" class="header">{{ receiver.user }}</a>
+                            <div class="meta">
+                            <span class="date">Joined in {{ receiver.created.year }}</span>
+                            </div>
+                            <div class="description">
+                            <p>{{ receiver.bio }}</p>
+                            </div>
+                        </div>
+                        <div class="extra content">
+                            <span class="">
+                                <i class="user icon"></i>{{ receiver.get_friends_no}} Friends
+                            </span>
+                            <span class="right floated">
+                                {% if receiver in receivers %}
+                                <form action="{% url "profiles:cancel-request-view" %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_id" value="{{receiver.pk}}">
+                                    <button type="submit" class="btn btn-secondary mb-5 btn-sm disabled" style="border-radius: 1px; display: inline;">Waiting</button>
+                                    <button type="submit" class="btn btn-danger mb-5 btn-sm" style="border-radius: 1px;"><i class="cancel icon"></i>cancel</button>
+                                </form>
+                                {% else %}
+                                    <form action="{% url "profiles:send-invitation" %}" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="receiver_pk" value="{{receiver.pk}}">
+                                        <button type="submit" class="btn btn-outline-success mb-5 btn-sm" style="border-radius: 1px;"><i class="plus square icon"></i>Add to freinds</button>
+                                    </form>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+{% endblock %}

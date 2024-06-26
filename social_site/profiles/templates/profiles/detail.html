@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}| {{ profile.user }}{% endblock %}
+
+{% block content %}
+    <div class="ui center aligned inverted blue segment mb-7">
+        <h3><i class="user icon"></i>{{ profile.user }}'s Profile</h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-4">
+            <img src="{{ profile.avatar.url }}" class="card-img-top" style="height: 220px;" alt="...">
+            {% if profile.user not in receiver_list and profile.user not in sender_list and request.user not in profile.friends.all %}
+                <form action="{% url "profiles:send-invitation" %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                    <button style="border-radius: 1px;" type="submit" class="btn btn-success btn-lg w-100 mt-2 mb-2"><i class="plus square icon"></i>Add to freinds</button>
+                </form>
+            {% endif %}
+
+            {% if profile.user in receiver_list and request.user not in profile.friends.all %}
+                <br>
+                <button style="border-radius: 1px;" class="btn btn-secondary btn-lg w-100 mb-2 disabled"><i class="user icon"></i>Waiting for approval...</button>
+            {% endif %}
+            {% if profile.user in sender_list and request.user not in profile.friends.all %}
+                <br>
+                <div>
+                    <form action="{% url "profiles:accept-invitation" %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                        <button style="border-radius: 1px; border-radius: 1px; width: 49.2%;" type="submit" class="btn btn-outline-success mb-1"><i class="check icon"></i>Accept</button>
+                    </form>
+                    <form action="{% url "profiles:reject-invitation" %}" method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                        <button style="border-radius: 1px; border-radius: 1px; width: 49.2%;" type="submit" class="btn btn-outline-danger mb-1 small"><i class="close icon"></i>Reject</button>
+                    </form>
+                </div>
+            {% endif %}
+            {% if request.user in profile.friends.all %}
+                <form action="{% url "profiles:remove-friend" %}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                    <button style="border-radius: 1px;" type="submit" class="btn btn-danger btn-lg w-100 mt-2 mb-2"><i class="minus square icon"></i>Remove from freinds</button>
+                </form>
+            {% endif %}
+
+
+        </div>
+        <div class="col-lg-8">
+            <table class="table table-striped">
+                <tbody>
+                    <tr>
+                        <td><h4><i class="user icon"></i>Username</h4></td>
+                        <td><h4>{{ profile.user }}</h4></td>
+                    </tr>
+                    <tr>
+                        <td><h4><i class="handshake icon"></i>&nbsp; Joined</h4></td>
+                        <td><h4>{{ profile.created.year }}</li></h4></td>
+                    </tr>
+                    <tr>
+                        <td><h4><i class="edit icon"></i>Bio</h4></td>
+                        <td><h4>{{ profile.bio|truncatechars:10 }}</li></h4></td>
+                    </tr>
+                    <tr>
+                        <td><h4><i class="users icon"></i>Friends</h4></td>
+                        <td><h4>{{ profile.get_friends_no }}</h4></td>
+                    </tr>
+                    <tr>
+                        <td><h4><i class="icon photo"></i>Posts</h4></td>
+                        <td><h4>{{ profile.get_total_posts }} </h4></td>
+                    </tr>
+                    <tr>
+                        <td><h4><h4><i class="icon thumbs up"></i>Likes</h4></td>
+                        <td><h4>{{ profile.get_likes_received_no }} </h4></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% if len_posts %}
+        {% for post in posts %}
+            <div class="ui fluid card">
+                <div class="ui fluid card">
+                    <div class="content">
+                        <div class="right floated meta">
+                            <div class="ui grid">
+                                <div class="row">
+                                    {% if request.user == post.author.user %}
+                                        <a href="{% url "posts:post-update" post.pk %}"><button class="ui button bwhite-lg">Update</button></a>
+                                        <a href="{% url "posts:post-delete" post.pk %}"><button class="ui button bwhite-lg">Delete</button></a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                            <img class="ui avatar image" src="{{ post.author.avatar.url }}" alt="">
+                            <b>{{ post.author.user }} - {{ post.created|timesince }} ago</b>
+                    </div>
+                </div>
+                <div class="ui fluid image">
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="">
+                    {% endif %}
+                </div>
+                <div class="content">
+                    <p>{{ post.content }}</p>
+                    <div class="right floated">
+                        <form action="{% url "posts:post-like-view" %}" method="post" class="like-form">
+                            {% csrf_token %}
+                            <input type="hidden" name="post_id" value="{{ post.id }}">
+                        
+                            <button data-icon="up" data-action="{% if user_profile in post.liked.all %}un{% endif %}like" data-id="{{post.id}}" id="like-btn{{post.id}}" type="submit" class="ui bwhite-sm button like-btn">
+                                {% if user_profile not in post.liked.all %}
+                                    <i id="icon{{post.id}}" class="thumbs up icon"></i></button>
+                                    <!-- like</button> -->
+                                {% else %}
+                                    <i id="icon{{post.id}}" class="thumbs down icon"></i></button>
+                                    <!-- unlike</button> -->
+                                {% endif %}         
+                                    <span id="likes{{post.id}}">{{ post.num_likes }} like{{ post.num_likes|pluralize }}</span>
+                        </form>
+                    </div>
+                    <i class="comment icon"></i>
+                    <span id="comments{{post.id}}">{{ post.num_comments }} comment{{ post.num_comments|pluralize }}</span>
+                </div>
+                <div class="extra content">
+                    <div class="mb-5">
+
+                    </div>
+                    <button style="border-radius: 1px;" data-id="{{post.id}}" class="cmt_btn ui button grey mb-5" id="cmt_btn">show/hide comments</button>
+                    <div class="comment-box" id="comment-box{{post.id}}">
+                        {% if post.comment_set.all %}
+                            {% for comment in post.comment_set.all %}
+                                <div class="ui segment mb-5">
+                                    <img class="ui avatar image" src="{{ comment.user.avatar.url }}" alt="">
+                                    <span>{{ comment.user }}</span> | {{ comment.created|date:"d-m-Y h:i A" }}
+                                    <div class="mt-5">{{ comment.body }}</div>
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="ui segment">
+                    <form action="" method="post" id="form{{post.id}}" class="ui fluid form">
+                        {% csrf_token %}
+                        {{ c_form }}
+                        <input type="hidden" name="post_id" value="{{ post.id }}" >
+                        <button data-id="{{post.id}}" style="border-radius: 1px;" style="margin-top: 10px;" type="submit" class="ui primary button mt-7 w-full cmnt-btn" name="submit_c_form">comment</button>
+                    </form>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+    <hr>
+        <center>
+            <h2 class="mt-5">{{ profile.user }}'s didn't share anything yet!</h2>
+        </center>
+    {% endif %}
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %} | My Friends {% endblock %}
+
+{% block content %}
+    <center>
+        <h1><i class="handshake icon"></i>&nbsp;My Friends List</h1>
+    </center>
+    <hr>
+    {% if total_friends == 0 %}
+        <h2 style="color: brown;">Opps! your friend list is empty :(</h2>
+    {% else %}
+    <div class="ui four stackable doubling cards mt-5">
+        {% for friend in friends %}
+            <div class="ui card">
+                <div class="image">
+                    <img style="height: 240px;" src="{{ friend.avatar.url }}">
+                </div>
+                <div class="content">
+                    <a href="{{ friend.get_absolute_url }}" class="header">{{ friend.user }}</a>
+                    <div class="meta">
+                    <span class="date">Joined in {{ friend.created.year }}</span>
+                    </div>
+                    <div class="description">
+                    <p>{{ friend.bio|truncatechars:10 }}</p>
+                    </div>
+                </div>
+                <div class="extra content">
+                    <span class="">
+                        <i class="user icon"></i>{{ friend.get_friends_no}} Friends
+                    </span>
+                    <span class="right floated">
+                        <form action="{% url "profiles:remove-friend" %}" method="post">
+                            {% csrf_token %}
+                            <input type="hidden" name="profile_pk" value="{{friend.pk}}">
+                            <button type="submit" class="btn btn-outline-danger mb-5 btn-sm" style="border-radius: 1px;"><i class="minus square icon"></i>Remove freind</button>
+                        </form>
+                    </span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endblock %}
+
+

@@ -1,0 +1,46 @@
+<div class="ui cards">
+    <div class="card">
+      <div class="content">
+        {% if post.image %}
+            <img class="right floated mini ui image" src="{{ post.image.url }}">
+        {% else %}
+            <img class="right floated mini ui image" src="">
+        {% endif %}
+        <div class="header">
+          Elliot Fu
+        </div>
+        <div class="meta">
+            {{ post.created }}
+        </div>
+        <div class="description">
+            {{ post.content }}
+        </div>
+      </div>
+
+      <div class="extra content">
+        <div class="ui two buttons">
+          <div class="ui basic green button">Approve</div>
+          <div class="ui basic red button">Decline</div>
+        </div>
+      </div>
+</div>
+
+
+{% if len_posts %}
+                    {% for post in posts %}
+                        <div class="ui segment fluid">
+                            {{ post.content }}
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <h1>No content shared yet!</h1>
+                {% endif %}
+
+
+
+<!-- <div class="extra content">
+                                <div class="ui two buttons">
+                                <div class="ui basic green button">Approve</div>
+                                <div class="ui basic red button">Decline</div>
+                                </div>
+                            </div> -->

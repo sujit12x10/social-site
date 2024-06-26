@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}| All Profiles {% endblock %}
+
+{% block content %}
+    <center>
+        <h1><i class="users icon"></i>&nbsp;bffBook Users' Profile</h1>
+    </center>
+    <hr>
+    {% if is_empty %}
+        <h3>No profiles to interact with</h3>
+    {% else %}
+        <div class="ui link four stackable doubling cards mt-5">
+            {% for profile in profiles %}
+                <div class="ui card">
+                    <div class="image">
+                        {% if profile in user.friends.all %}
+                        <div class="ui green ribbon label">
+                            <i class="user icon"></i>Friend
+                        </div>
+                        {% endif %}
+                        <img style="height: 240px;" src="{{ profile.avatar.url }}">
+                    </div>
+                    <div class="content">
+                        <a href="{{ profile.get_absolute_url }}" class="header">{{ profile.user }}</a>
+                        <div class="meta">
+                        <span class="date">Joined in {{ profile.created.year }}</span>
+                        </div>
+                        <div class="description">
+                        <p>{{ profile.bio|truncatechars:10 }}</p>
+                        </div>
+                    </div>
+                    <div class="extra content">
+                        <span class="">
+                            <i class="user icon"></i>{{ profile.get_friends_no}} Friends
+                        </span>
+                        <span class="right floated">
+                           <a href="{{ profile.get_absolute_url }}"><button class="btn btn-primary btn-sm" style="border-radius: 1px;">View Profile</button></a>
+                        </span>
+                    </div>
+
+                    <div class="extra content">
+                        {% if profile.user not in receiver_list and profile.user not in sender_list and request.user not in profile.friends.all %}
+                            <form action="{% url "profiles:send-invitation" %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                                <button type="submit" class="btn btn-outline-success mb-5 w-100" style="border-radius: 1px;"><i class="plus square icon"></i>Add to freinds</button>
+                            </form>
+                        {% endif %}
+
+                        {% if profile.user in receiver_list and request.user not in profile.friends.all %}
+                                <form action="{% url "profiles:cancel-request-view" %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_id" value="{{profile.pk}}">
+                                    <button type="submit" class="btn btn-secondary mb-5 btn-sm disabled" style="border-radius: 1px; display: inline; width: 49%;">Waiting</button>
+                                    <button type="submit" class="btn btn-outline-danger mb-5 btn-sm" style="border-radius: 1px; width: 49%;"><i class="close icon"></i>Cancel</button>
+                                </form>
+                        {% endif %}
+
+                            {% if profile.user in sender_list and request.user not in profile.friends.all %}
+                                <form action="{% url "profiles:accept-invitation" %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                                    <button type="submit" class="btn btn-outline-success mb-5 btn-sm" style="border-radius: 1px; width: 49%;"><i class="check icon"></i>Accept</button>
+                                </form>
+                                <form action="{% url "profiles:reject-invitation" %}" method="post" style="display: inline;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                                    <button type="submit" class="btn btn-outline-danger mb-5 btn-sm" style="border-radius: 1px; width: 49%;"><i class="close icon"></i>Reject</button>
+                                </form>
+                            {% endif %}
+
+                            {% if request.user in profile.friends.all %}
+                                <form action="{% url "profiles:remove-friend" %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="profile_pk" value="{{profile.pk}}">
+                                    <button type="submit" class="btn btn-outline-danger mb-5 btn-sm w-100" style="border-radius: 1px;"><i class="minus square icon"></i>Remove freind</button>
+                                </form>
+                            {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}
+
+
+
+

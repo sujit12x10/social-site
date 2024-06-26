@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+
+{% block title %}Create an account{% endblock %}
+
+{% block content %}
+    <div class="form-container">
+        <h2>Create an account</h2>
+        <hr>
+        <p class="register-form">Please sign up using the following form:</p>
+        <form method="post" class="ui form">
+            {% csrf_token %}
+            <div class="mt-4 text-danger">
+                {% for field in user_form %}
+                    {{ field.errors|striptags }}
+                {% endfor %}
+            </div>
+            <div class="field">
+                {% render_field user_form.username class="form-control mb-4 mt-4" placeholder="Username" %}
+            </div>
+            <div class="field">
+                {% render_field user_form.first_name class="form-control mb-4" placeholder="First Name" %}
+            </div>
+            <div class="field">
+                {% render_field user_form.last_name class="form-control mb-4" placeholder="Last Name" %}
+            </div>
+            <div class="field">
+                {% render_field user_form.email class="form-control mb-4" placeholder="Email" %}
+            </div>
+            <div class="field">
+                {% render_field user_form.password class="form-control mb-4" placeholder="Password" %}
+            </div>
+            <div class="field">
+                {% render_field user_form.password2 class="form-control mb-4" placeholder="Repeat Password" %}
+            </div>
+            <div class="field">
+                {% render_field user_form.status class="form-control mb-4" %}
+            </div>
+            <button class="btn btn-outline-dark">create my account</button>
+        </form>
+    </div>
+{% endblock %}
